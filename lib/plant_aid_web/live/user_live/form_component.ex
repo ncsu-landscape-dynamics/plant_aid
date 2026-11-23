@@ -1,6 +1,8 @@
 defmodule PlantAidWeb.UserLive.FormComponent do
   use PlantAidWeb, :live_component
 
+  require Logger
+
   alias PlantAid.Accounts
   alias PlantAid.Accounts.User
 
@@ -87,21 +89,33 @@ defmodule PlantAidWeb.UserLive.FormComponent do
     with :ok <- Bodyguard.permit(Accounts, :create_user, socket.assigns.current_user) do
       case Accounts.create_user(user_params) do
         {:ok, user} ->
-          if Map.get(user_params, "invite") == "true" do
-            {:ok, _} =
-              Accounts.deliver_user_invite(
-                user,
-                socket.assigns.current_user,
-                &url(~p"/users/invite/#{&1}")
-              )
-          end
+          socket =
+            if Map.get(user_params, "invite") == "true" do
+              case Accounts.deliver_user_invite(
+                     user,
+                     socket.assigns.current_user,
+                     &url(~p"/users/invite/#{&1}")
+                   ) do
+                {:ok, _} ->
+                  put_flash(socket, :info, "User created and invitation sent")
+
+                {:error, reason} ->
+                  Logger.warning("Could not send invite to #{user.email}: #{inspect(reason)}")
+
+                  put_flash(
+                    socket,
+                    :error,
+                    "User created, but the invitation email could not be sent: " <>
+                      delivery_error_message(reason)
+                  )
+              end
+            else
+              put_flash(socket, :info, "User created successfully")
+            end
 
           notify_parent({:saved, user})
 
-          {:noreply,
-           socket
-           |> put_flash(:info, "User created successfully")
-           |> push_patch(to: socket.assigns.patch)}
+          {:noreply, push_patch(socket, to: socket.assigns.patch)}
 
         {:error, %Ecto.Changeset{} = changeset} ->
           {:noreply, assign_form(socket, changeset)}
@@ -112,6 +126,12 @@ defmodule PlantAidWeb.UserLive.FormComponent do
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     assign(socket, :form, to_form(changeset))
   end
+
+  # Swoosh API adapters (e.g. Brevo) return {status, %{"message" => ...}} on rejection.
+  defp delivery_error_message({_status, %{"message" => message}}) when is_binary(message),
+    do: message
+
+  defp delivery_error_message(_reason), do: "the email service rejected it"
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
 

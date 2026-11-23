@@ -31,7 +31,7 @@ defmodule PlantAidWeb.UserRegistrationLiveTest do
         |> render_change(user: %{"email" => "with spaces", "password" => "too short"})
 
       assert result =~ "Register"
-      assert result =~ "must have the @ sign and no spaces"
+      assert result =~ "must be a valid email address, like name@example.org"
       assert result =~ "should be at least 12 character"
     end
   end

@@ -465,6 +465,39 @@ Uploaders.S3 = function (entries, onViewError) {
 }
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+// Cloudflare Turnstile bot check (see the <.turnstile> component). The script is
+// loaded only on pages that render the widget.
+let turnstileScript = null
+const loadTurnstile = () => {
+  if (window.turnstile) return Promise.resolve(window.turnstile)
+  if (!turnstileScript) {
+    turnstileScript = new Promise((resolve, reject) => {
+      const script = document.createElement("script")
+      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+      script.async = true
+      script.onload = () => resolve(window.turnstile)
+      script.onerror = reject
+      document.head.appendChild(script)
+    })
+  }
+  return turnstileScript
+}
+
+Hooks.Turnstile = {
+  mounted() {
+    loadTurnstile().then((turnstile) => {
+      this.widgetId = turnstile.render(this.el, { sitekey: this.el.dataset.sitekey })
+    })
+    // Tokens are single-use: the server asks for a fresh one after a failed submit.
+    this.handleEvent("turnstile:reset", () => {
+      if (window.turnstile && this.widgetId !== undefined) window.turnstile.reset(this.widgetId)
+    })
+  },
+  destroyed() {
+    if (window.turnstile && this.widgetId !== undefined) window.turnstile.remove(this.widgetId)
+  }
+}
+
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: { _csrf_token: csrfToken, user_token: window.userToken },

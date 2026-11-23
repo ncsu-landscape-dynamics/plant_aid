@@ -2,6 +2,7 @@ defmodule PlantAidWeb.UserForgotPasswordLive do
   use PlantAidWeb, :live_view
 
   alias PlantAid.Accounts
+  alias PlantAid.Turnstile
 
   def render(assigns) do
     ~H"""
@@ -13,6 +14,7 @@ defmodule PlantAidWeb.UserForgotPasswordLive do
 
       <.simple_form for={@form} id="reset_password_form" phx-submit="send_email">
         <.input field={@form[:email]} type="email" placeholder="Email" required />
+        <.turnstile />
         <:actions>
           <.button phx-disable-with="Sending..." class="w-full">
             Send password reset instructions
@@ -30,7 +32,20 @@ defmodule PlantAidWeb.UserForgotPasswordLive do
     {:ok, assign(socket, form: to_form(%{}, as: "user"))}
   end
 
-  def handle_event("send_email", %{"user" => %{"email" => email}}, socket) do
+  def handle_event("send_email", %{"user" => %{"email" => email}} = params, socket) do
+    case Turnstile.verify(params) do
+      :ok ->
+        send_reset_email(email, socket)
+
+      {:error, _} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Please complete the verification check and try again.")
+         |> push_event("turnstile:reset", %{})}
+    end
+  end
+
+  defp send_reset_email(email, socket) do
     if user = Accounts.get_user_by_email(email) do
       Accounts.deliver_user_reset_password_instructions(
         user,

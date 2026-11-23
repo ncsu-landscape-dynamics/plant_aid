@@ -809,6 +809,27 @@ defmodule PlantAidWeb.CoreComponents do
   end
 
   @doc """
+  Cloudflare Turnstile bot check. Renders nothing unless Turnstile is configured
+  (see `PlantAid.Turnstile`). Place it inside a form; Turnstile adds a hidden
+  `cf-turnstile-response` input that the LiveView verifies on submit.
+  """
+  attr :id, :string, default: "turnstile"
+
+  def turnstile(assigns) do
+    ~H"""
+    <div
+      :if={PlantAid.Turnstile.enabled?()}
+      id={@id}
+      phx-hook="Turnstile"
+      phx-update="ignore"
+      data-sitekey={PlantAid.Turnstile.site_key()}
+      class="flex justify-center"
+    >
+    </div>
+    """
+  end
+
+  @doc """
   Pagination links for Flop-paginated lists (wraps `Flop.Phoenix.pagination/1`).
 
   flop_phoenix 0.25 removed configuration through `config :flop_phoenix`, so the

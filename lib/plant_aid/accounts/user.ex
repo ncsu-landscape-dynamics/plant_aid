@@ -98,7 +98,11 @@ defmodule PlantAid.Accounts.User do
   defp validate_email(changeset, opts) do
     changeset
     |> validate_required([:email])
-    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
+    # Require a domain with a dot (name@example.org); the email provider (Brevo) rejects
+    # addresses like "name@host", which used to crash user invites/registration.
+    |> validate_format(:email, ~r/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
+      message: "must be a valid email address, like name@example.org"
+    )
     |> validate_length(:email, max: 160)
     |> maybe_validate_unique_email(opts)
   end

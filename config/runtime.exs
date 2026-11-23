@@ -24,6 +24,11 @@ end
 config :plant_aid,
   registration_enabled: String.to_existing_atom(System.get_env("REGISTRATION_ENABLED") || "false")
 
+# Cloudflare Turnstile bot check on public forms; disabled unless both keys are set.
+config :plant_aid, PlantAid.Turnstile,
+  site_key: System.get_env("TURNSTILE_SITE_KEY"),
+  secret_key: System.get_env("TURNSTILE_SECRET_KEY")
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

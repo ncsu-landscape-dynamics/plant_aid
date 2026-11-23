@@ -5,6 +5,7 @@ defmodule PlantAidWeb.UserRegistrationLive do
 
   alias PlantAid.Accounts
   alias PlantAid.Accounts.User
+  alias PlantAid.Turnstile
 
   def render(assigns) do
     ~H"""
@@ -36,6 +37,7 @@ defmodule PlantAidWeb.UserRegistrationLive do
         <.input field={@form[:email]} type="email" label="Email" required />
         <.input field={@form[:password]} type="password" label="Password" required />
         <.input field={@form[:name]} type="text" label="Name" />
+        <.turnstile />
 
         <:actions>
           <.button variant="primary" phx-disable-with="Creating account..." class="w-full">
@@ -62,16 +64,39 @@ defmodule PlantAidWeb.UserRegistrationLive do
     end
   end
 
-  def handle_event("save", %{"user" => user_params}, socket) do
+  def handle_event("save", %{"user" => user_params} = params, socket) do
+    case Turnstile.verify(params) do
+      :ok ->
+        register(user_params, socket)
+
+      {:error, _} ->
+        changeset = Accounts.change_user_registration(%User{}, user_params)
+
+        {:noreply,
+         socket
+         |> put_flash(:error, "Please complete the verification check and try again.")
+         |> assign_form(changeset)
+         |> push_event("turnstile:reset", %{})}
+    end
+  end
+
+  defp register(user_params, socket) do
     case Accounts.register_user(user_params) do
       {:ok, user} ->
         Logger.info("New user: #{user.email}")
 
-        {:ok, _} =
-          Accounts.deliver_user_confirmation_instructions(
-            user,
-            &url(~p"/users/confirm/#{&1}")
-          )
+        case Accounts.deliver_user_confirmation_instructions(
+               user,
+               &url(~p"/users/confirm/#{&1}")
+             ) do
+          {:ok, _} ->
+            :ok
+
+          {:error, reason} ->
+            Logger.warning(
+              "Could not send confirmation email to #{user.email}: #{inspect(reason)}"
+            )
+        end
 
         changeset = Accounts.change_user_registration(user)
 
