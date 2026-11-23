@@ -64,6 +64,9 @@ defmodule PlantAid.MixProject do
       {:kday, "~> 1.1"},
       # Specific project dependencies
       {:geo_postgis, "~> 3.4"},
+      # Geo 4.1 encodes JSON only via Elixir's built-in JSON on Elixir >= 1.18, but Phoenix/LiveView
+      # use Jason -> Protocol.UndefinedError for Geo structs. Hold at 4.0.x. (2026-11-23)
+      {:geo, "~> 4.0.1"},
       {:nimble_csv, "~> 1.2"},
       {:flop, "~> 0.25.0"},
       {:flop_phoenix, "~> 0.22.9"},
