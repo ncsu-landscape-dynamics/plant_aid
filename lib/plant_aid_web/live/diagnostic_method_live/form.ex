@@ -34,7 +34,7 @@ defmodule PlantAidWeb.DiagnosticMethodLive.Form do
             <li><strong>select</strong>: a select dropdown with options you can provide here</li>
             <li><strong>list</strong>: a list of strings or images</li>
             <li>
-              <strong>map</strong>: a mapping of user provided string keys to string or select fields (ex: {"key": "value"}). You might want to use this if you know there will be labelled data, but you don't know what the labels will be ahead of time or they might change.
+              <strong>map</strong>: a mapping of user provided string keys to string or select fields (ex: &#123;"key": "value"&#125;). You might want to use this if you know there will be labelled data, but you don't know what the labels will be ahead of time or they might change.
             </li>
           </ul>
           <div>

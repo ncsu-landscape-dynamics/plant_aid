@@ -1,7 +1,7 @@
 defmodule PlantAidWeb.ObservationLive.SampleFormComponent do
   use PlantAidWeb, :live_component
 
-  alias PlantAid.Diagnostics
+  alias PlantAid.DiagnosticMethods
   alias PlantAid.Observations
   alias PlantAid.Observations.Sample
   alias PlantAid.FormHelpers
@@ -98,7 +98,7 @@ defmodule PlantAidWeb.ObservationLive.SampleFormComponent do
       end
 
     diagnostic_method_options =
-      Diagnostics.list_diagnostic_methods()
+      DiagnosticMethods.list_diagnostic_methods()
       |> Enum.map(fn dm ->
         {dm.name, dm.id}
       end)
@@ -152,7 +152,7 @@ defmodule PlantAidWeb.ObservationLive.SampleFormComponent do
         %{"sample" => %{"diagnostic_method_id" => diagnostic_method_id}},
         socket
       ) do
-    diagnostic_method = Diagnostics.get_diagnostic_method!(diagnostic_method_id)
+    diagnostic_method = DiagnosticMethods.get_diagnostic_method!(diagnostic_method_id)
 
     data =
       diagnostic_method.field_names

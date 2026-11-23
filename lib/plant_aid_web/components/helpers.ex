@@ -16,7 +16,7 @@ defmodule PlantAidWeb.Helpers do
 
   def pagination_opts do
     [
-      page_links: {:ellipsis, 5},
+      # flop_phoenix 0.24: page_links option removed here; the component default is now 5.
       pagination_list_attrs: [class: "flex flex-row"]
     ]
   end

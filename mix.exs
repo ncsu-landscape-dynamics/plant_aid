@@ -40,7 +40,7 @@ defmodule PlantAid.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 4.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 0.18"},
+      {:phoenix_live_view, "~> 1.0.17"},
       {:heroicons, "~> 0.5"},
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.7"},
@@ -69,7 +69,7 @@ defmodule PlantAid.MixProject do
       {:geo, "~> 4.0.1"},
       {:nimble_csv, "~> 1.2"},
       {:flop, "~> 0.25.0"},
-      {:flop_phoenix, "~> 0.22.9"},
+      {:flop_phoenix, "~> 0.24.1"},
       {:qr_code, "~> 3.0.0"},
       {:ex_aws, "~> 2.0"},
       {:ex_aws_s3, "~> 2.0"}
