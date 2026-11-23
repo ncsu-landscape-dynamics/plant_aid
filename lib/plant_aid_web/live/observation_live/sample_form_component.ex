@@ -155,9 +155,11 @@ defmodule PlantAidWeb.ObservationLive.SampleFormComponent do
     diagnostic_method = DiagnosticMethods.get_diagnostic_method!(diagnostic_method_id)
 
     data =
-      diagnostic_method.field_names
-      |> Enum.with_index(fn field_name, index ->
-        {index, %{"key" => field_name.value}}
+      # Diagnostic methods store their fields as embedded `fields` (each with a `name`);
+      # the old `field_names` association no longer exists.
+      diagnostic_method.fields
+      |> Enum.with_index(fn field, index ->
+        {index, %{"key" => field.name}}
       end)
       |> Map.new()
 

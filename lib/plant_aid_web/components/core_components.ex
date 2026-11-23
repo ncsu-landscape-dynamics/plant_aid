@@ -808,6 +808,21 @@ defmodule PlantAidWeb.CoreComponents do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
 
+  @doc """
+  Pagination links for Flop-paginated lists (wraps `Flop.Phoenix.pagination/1`).
+
+  flop_phoenix 0.25 removed configuration through `config :flop_phoenix`, so the
+  app-wide pagination attributes are set here.
+  """
+  attr :meta, Flop.Meta, required: true
+  attr :path, :any, required: true
+
+  def pagination(assigns) do
+    ~H"""
+    <Flop.Phoenix.pagination meta={@meta} path={@path} page_list_attrs={[class: "flex flex-row"]} />
+    """
+  end
+
   attr :meta, Flop.Meta, required: true
   attr :fields, :list, required: true
   attr :id, :string, default: nil

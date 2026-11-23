@@ -7,6 +7,8 @@ defmodule PlantAid.MixProject do
       version: "0.1.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
+      # Required by LiveView 1.1 (colocated hooks/JS extraction).
+      compilers: [:phoenix_live_view] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -40,9 +42,11 @@ defmodule PlantAid.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 4.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 1.0.17"},
+      {:phoenix_live_view, "~> 1.1.0"},
       {:heroicons, "~> 0.5"},
       {:floki, ">= 0.30.0", only: :test},
+      # LiveView 1.1 test helpers use LazyHTML instead of Floki.
+      {:lazy_html, ">= 0.0.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.7"},
       {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
@@ -69,7 +73,7 @@ defmodule PlantAid.MixProject do
       {:geo, "~> 4.0.1"},
       {:nimble_csv, "~> 1.2"},
       {:flop, "~> 0.25.0"},
-      {:flop_phoenix, "~> 0.24.1"},
+      {:flop_phoenix, "~> 0.25.3"},
       {:qr_code, "~> 3.0.0"},
       {:ex_aws, "~> 2.0"},
       {:ex_aws_s3, "~> 2.0"}

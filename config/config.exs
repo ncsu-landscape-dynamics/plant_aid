@@ -77,9 +77,8 @@ config :geo_postgis,
 
 config :flop, repo: PlantAid.Repo, default_limit: 25
 
-config :flop_phoenix,
-  pagination: [opts: {PlantAidWeb.Helpers, :pagination_opts}],
-  table: [opts: {PlantAidWeb.Helpers, :table_opts}]
+# flop_phoenix 0.25 removed configuration via the application environment;
+# pagination styling now lives in the <.pagination> component in core_components.ex.
 
 config :ex_aws,
   json_codec: Jason,
