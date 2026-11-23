@@ -60,7 +60,7 @@ defmodule PlantAid.MixProject do
       # General additional dependencies
       {:bodyguard, "~> 2.4"},
       {:ecto_psql_extras, "~> 0.6"},
-      {:error_tracker, "~> 0.2"},
+      {:error_tracker, "~> 0.9.0"},
       {:libcluster, "~> 3.3"},
       {:oban, "~> 2.17"},
       {:tz, "~> 0.28"},
