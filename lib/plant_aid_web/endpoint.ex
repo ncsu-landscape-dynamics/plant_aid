@@ -38,6 +38,9 @@ defmodule PlantAidWeb.Endpoint do
     plug Phoenix.Ecto.CheckRepoStatus, otp_app: :plant_aid
   end
 
+  # Kubernetes health checks: answered before logging, sessions and the router.
+  plug PlantAidWeb.Plugs.Healthz
+
   plug Phoenix.LiveDashboard.RequestLogger,
     param_key: "request_logger",
     cookie_key: "request_logger"
