@@ -1,0 +1,58 @@
+# Build the plant-aid image for the DigitalOcean nodes (linux/amd64) and push it
+# to Docker Hub as chris687/plantaid-server:<short-commit> and :latest.
+#
+# Needs two repository secrets (Settings → Secrets and variables → Actions):
+#   DOCKERHUB_USERNAME  = chris687
+#   DOCKERHUB_TOKEN     = a Docker Hub personal access token (Read & Write)
+#
+# Deploying is still done in cga-ops: point the plantaid manifests at the new tag.
+
+name: Build and push image
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Image tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: chris687/plantaid-server
+          tags: |
+            type=sha,format=short,prefix=
+            type=raw,value=latest
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Summary
+        run: |
+          echo "Pushed:" >> "$GITHUB_STEP_SUMMARY"
+          echo '${{ steps.meta.outputs.tags }}' | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY"

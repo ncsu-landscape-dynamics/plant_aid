@@ -1,6 +1,10 @@
 #!/bin/sh
+# Build the plant-aid image for the DigitalOcean nodes (linux/amd64) and push it
+# to Docker Hub, tagged with the current commit hash and "latest".
+set -e
+IMAGE=chris687/plantaid-server
 HASH=$(git rev-parse --short HEAD)
-docker build -t chrej/plantaid-server:latest -t chrej/plantaid-server:$HASH .
-docker push chrej/plantaid-server:$HASH
-docker push chrej/plantaid-server:latest
-echo "Pushed image tag: $HASH"
+docker buildx build --platform linux/amd64 \
+  -t "$IMAGE:$HASH" -t "$IMAGE:latest" \
+  --push .
+echo "Pushed image tag: $IMAGE:$HASH"
