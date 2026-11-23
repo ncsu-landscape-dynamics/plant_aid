@@ -34,12 +34,30 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6"), do: [:inet6], else: []
 
+  # Database TLS. When DATABASE_CA_CERT_FILE points at DigitalOcean's CA certificate
+  # (mounted from a Kubernetes Secret), the server certificate and hostname are verified.
+  # Without it the connection is still encrypted but not verified (previous behaviour),
+  # so each environment can be switched over on its own.
+  db_ssl =
+    case System.get_env("DATABASE_CA_CERT_FILE") do
+      nil ->
+        [verify: :verify_none]
+
+      ca_file ->
+        db_host = URI.parse(database_url).host
+
+        [
+          verify: :verify_peer,
+          cacertfile: ca_file,
+          server_name_indication: String.to_charlist(db_host),
+          customize_hostname_check: [
+            match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
+          ]
+        ]
+    end
+
   config :plant_aid, PlantAid.Repo,
-    ssl: true,
-    ssl_opts: [
-      verify: :verify_none
-      # cacerts: :public_key.cacerts_get()
-    ],
+    ssl: db_ssl,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "2"),
     socket_options: maybe_ipv6
