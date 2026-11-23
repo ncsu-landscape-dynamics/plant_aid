@@ -39,12 +39,11 @@ defmodule PlantAidWeb do
   def controller do
     quote do
       use Phoenix.Controller,
-        namespace: PlantAidWeb,
         formats: [:html, :json],
         layouts: [html: PlantAidWeb.Layouts]
 
       import Plug.Conn
-      import PlantAidWeb.Gettext
+      use Gettext, backend: PlantAidWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -86,7 +85,7 @@ defmodule PlantAidWeb do
       import Phoenix.HTML
       # Core UI components and translation
       import PlantAidWeb.CoreComponents
-      import PlantAidWeb.Gettext
+      use Gettext, backend: PlantAidWeb.Gettext
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS

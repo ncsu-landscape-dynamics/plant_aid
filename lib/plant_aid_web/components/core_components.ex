@@ -17,7 +17,7 @@ defmodule PlantAidWeb.CoreComponents do
   use Phoenix.Component
 
   alias Phoenix.LiveView.JS
-  import PlantAidWeb.Gettext
+  use Gettext, backend: PlantAidWeb.Gettext
 
   @doc """
   Renders a modal.

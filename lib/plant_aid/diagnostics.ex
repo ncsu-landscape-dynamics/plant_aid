@@ -1,9 +1,6 @@
 defmodule PlantAid.Diagnostics do
-  @behaviour Bodyguard.Policy
-
   import Ecto.Query, warn: false
   alias PlantAid.Repo
-  alias PlantAid.Accounts.User
   alias PlantAid.Diagnostics.Diagnostic
 
   def list_diagnostics(observation_id) do
@@ -38,15 +35,15 @@ defmodule PlantAid.Diagnostics do
 
   # alias PlantAid.Diagnostics.DiagnosticTestResult
 
-  @doc """
-  Returns the list of diagnostic_test_results.
-
-  ## Examples
-
-      iex> list_diagnostic_test_results()
-      [%DiagnosticTestResult{}, ...]
-
-  """
+  # @doc """
+  # Returns the list of diagnostic_test_results.
+  #
+  # ## Examples
+  #
+  #     iex> list_diagnostic_test_results()
+  #     [%DiagnosticTestResult{}, ...]
+  #
+  # """
   # def list_diagnostic_test_results do
   #   Repo.all(DiagnosticTestResult)
   # end

@@ -94,13 +94,6 @@ defmodule PlantAidWeb.Router do
       live "/alerts/subscriptions/:id", AlertSubscriptionLive.Show, :show
       live "/alerts/subscriptions/:id/show/edit", AlertSubscriptionLive.Show, :edit
 
-      live "/alerts/settings", AlertSettingLive.Index, :index
-      live "/alerts/settings/new", AlertSettingLive.Index, :new
-      live "/alerts/settings/:id/edit", AlertSettingLive.Index, :edit
-
-      live "/alerts/settings/:id", AlertSettingLive.Show, :show
-      live "/alerts/settings/:id/show/edit", AlertSettingLive.Show, :edit
-
       live "/alerts", AlertLive.Index, :index
       live "/alerts/:id", AlertLive.Show, :show
 
