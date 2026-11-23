@@ -80,7 +80,7 @@ if config_env() == :prod do
         ]
       ]
   else
-    Logger.warn(
+    Logger.warning(
       "Environment variable LIBCLUSTER_SERVICE_NAME is missing, running without libcluster"
     )
   end

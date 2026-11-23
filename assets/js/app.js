@@ -93,8 +93,17 @@ Hooks.MapBoxAggregateData = {
     const map = new mapboxgl.Map({
       container: this.el,
       trackResize: false,
-      style: 'mapbox://styles/mapbox/light-v10'
+      style: 'mapbox://styles/mapbox/light-v10',
+      // Explicit starting view: without it, Mapbox applies the style's default view
+      // (Europe) when the style finishes loading, overriding an earlier fitBounds.
+      center: [-98.5, 39.5],
+      zoom: 3
     })
+
+    // Bounds can arrive from the server before the style has loaded; keep the latest
+    // and apply it once the map is ready.
+    let mapLoaded = false;
+    let pendingBounds = null;
 
     let tempData = { type: "FeatureCollection", features: [] };
 
@@ -104,7 +113,8 @@ Hooks.MapBoxAggregateData = {
 
     this.handleEvent("map-data", ({ data, bounds }) => {
       if (bounds) {
-        map.fitBounds(bounds, { padding: 10 });
+        pendingBounds = bounds;
+        if (mapLoaded) map.fitBounds(bounds, { padding: 10 });
       }
 
       let source = map.getSource("regions");
@@ -119,6 +129,8 @@ Hooks.MapBoxAggregateData = {
     })
 
     map.on('load', () => {
+      mapLoaded = true;
+      if (pendingBounds) map.fitBounds(pendingBounds, { padding: 10, animate: false });
       map.addSource('regions', {
         type: "geojson",
         data: tempData
@@ -272,8 +284,17 @@ Hooks.MapBoxPointData = {
     const map = new mapboxgl.Map({
       container: this.el,
       trackResize: false,
-      style: 'mapbox://styles/mapbox/light-v10'
+      style: 'mapbox://styles/mapbox/light-v10',
+      // Explicit starting view: without it, Mapbox applies the style's default view
+      // (Europe) when the style finishes loading, overriding an earlier fitBounds.
+      center: [-98.5, 39.5],
+      zoom: 3
     })
+
+    // Bounds can arrive from the server before the style has loaded; keep the latest
+    // and apply it once the map is ready.
+    let mapLoaded = false;
+    let pendingBounds = null;
 
     let tempData = { type: "FeatureCollection", features: [] };
 
@@ -285,7 +306,8 @@ Hooks.MapBoxPointData = {
       console.log("setting map data", data);
       if (bounds) {
         console.log("setting bounds", bounds);
-        map.fitBounds(bounds, { padding: 10 });
+        pendingBounds = bounds;
+        if (mapLoaded) map.fitBounds(bounds, { padding: 10 });
       }
 
       let source = map.getSource("observations");
@@ -300,6 +322,8 @@ Hooks.MapBoxPointData = {
     })
 
     map.on('load', () => {
+      mapLoaded = true;
+      if (pendingBounds) map.fitBounds(pendingBounds, { padding: 10, animate: false });
       console.log('map loaded, settings data from temp variable');
       map.addSource('observations', {
         type: "geojson",
