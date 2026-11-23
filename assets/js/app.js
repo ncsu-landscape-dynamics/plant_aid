@@ -468,8 +468,9 @@ let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("
 // Cloudflare Turnstile bot check (see the <.turnstile> component). The script is
 // loaded only on pages that render the widget.
 let turnstileScript = null
+const turnstileReady = () => window.turnstile && typeof window.turnstile.render === "function"
 const loadTurnstile = () => {
-  if (window.turnstile) return Promise.resolve(window.turnstile)
+  if (turnstileReady()) return Promise.resolve(window.turnstile)
   if (!turnstileScript) {
     turnstileScript = new Promise((resolve, reject) => {
       const script = document.createElement("script")
@@ -490,11 +491,11 @@ Hooks.Turnstile = {
     })
     // Tokens are single-use: the server asks for a fresh one after a failed submit.
     this.handleEvent("turnstile:reset", () => {
-      if (window.turnstile && this.widgetId !== undefined) window.turnstile.reset(this.widgetId)
+      if (turnstileReady() && this.widgetId !== undefined) window.turnstile.reset(this.widgetId)
     })
   },
   destroyed() {
-    if (window.turnstile && this.widgetId !== undefined) window.turnstile.remove(this.widgetId)
+    if (turnstileReady() && this.widgetId !== undefined) window.turnstile.remove(this.widgetId)
   }
 }
 

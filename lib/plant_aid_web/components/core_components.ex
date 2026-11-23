@@ -813,7 +813,8 @@ defmodule PlantAidWeb.CoreComponents do
   (see `PlantAid.Turnstile`). Place it inside a form; Turnstile adds a hidden
   `cf-turnstile-response` input that the LiveView verifies on submit.
   """
-  attr :id, :string, default: "turnstile"
+  # Not "turnstile": an element id becomes a window global and would shadow window.turnstile.
+  attr :id, :string, default: "turnstile-widget"
 
   def turnstile(assigns) do
     ~H"""
